@@ -17,7 +17,9 @@ void A10kOhmError() {
     }
     in.close();
     c->cd(1);
-    h1->Draw();
+    h1->Fit("gaus");
+    TF1* fit = h1->GetFunction("gaus");
+    std::cout << "Chiquadro ridotto: " << fit->GetChisquare() / fit->GetNDF() << '\n'; h1->Draw();
 
 
     TH1F* h2 = new TH1F("100Ohm Resistance", "Apliude distribution (100Ohm Resistance)", 300, 0.482, 0.43);
@@ -29,6 +31,9 @@ void A10kOhmError() {
     in.close();
 
     c->cd(2);
+    h2->Fit("gaus");
+    TF1* fit2 = h2->GetFunction("gaus");
+    std::cout << "Chiquadro ridotto: " << fit2->GetChisquare() / fit2->GetNDF() << '\n';
     h2->Draw();
 
     double mean_10 = h1->GetMean();

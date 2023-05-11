@@ -1,4 +1,4 @@
-void sweep10kOhm(){
+void sweep10kOhm2(){
     TCanvas* c = new TCanvas("c1", "Sweep with 10kOhm");
     c->Divide(2,3);
 
@@ -37,8 +37,8 @@ void sweep10kOhm(){
     in.open("Amplitude-Resistance.txt");
     double y_min = 10;
     double x_min = 0;
-    x= 0;
-    y =0;
+    x = 0;
+    y = 0;
     while (in.good()) {
         in >> x >> y;
         if (y < y_min) {

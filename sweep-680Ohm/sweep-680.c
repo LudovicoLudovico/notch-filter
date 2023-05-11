@@ -1,25 +1,25 @@
-void sweep10kOhm(){
-    TCanvas* c = new TCanvas("c1", "Sweep with 10kOhm");
+void sweep680Ohm(){
+    TCanvas* c = new TCanvas("c1", "Sweep with 680Ohm");
     c->Divide(2,3);
 
-    TGraph* ampFGen = new TGraph("Amplitude-FGen.txt");
+    TGraph* ampFGen = new TGraph("FGen - Amp - 680Ohm 1-20KHz.txt");
     c->cd(1);
     ampFGen->Draw();
 
-    TGraph* ampRes = new TGraph("Amplitude-Resistance.txt");
+    TGraph* ampRes = new TGraph("Res - Amp - 680Ohm 1-20KHz.txt");
     c->cd(2);
     ampRes->Draw();
 
-    TGraph* phaseFGen = new TGraph("Phase-FGen.txt");
+    TGraph* phaseFGen = new TGraph("FGen - Phase - 680Ohm 1-20KHz.txt");
     c->cd(3);
     phaseFGen->Draw();
 
-    TGraph* phaseRes = new TGraph("Phase-Resistance.txt");
+    TGraph* phaseRes = new TGraph("Res - Phase - 680OHm 1-20KHz.txt");
     c->cd(4);
     phaseRes->Draw();
 
     ifstream in;
-    in.open("Amplitude-FGen.txt");
+    in.open("FGen - Amp - 680Ohm 1-20KHz.txt");
     double y_max = 0;
     double x_max = 0;
     Float_t x,y;
@@ -34,7 +34,7 @@ void sweep10kOhm(){
 
     std::cout << "\nAmplitude of FGen: \n" << "- Maximum: " << "(" << x_max << " , " << y_max << ")";
 
-    in.open("Amplitude-Resistance.txt");
+    in.open("Res - Amp - 680Ohm 1-20KHz.txt");
     double y_min = 10;
     double x_min = 0;
     x= 0;
@@ -53,8 +53,8 @@ void sweep10kOhm(){
     // Transfer function
     TGraph* transfer = new TGraph();
     ifstream inGen;
-    inGen.open("Amplitude-FGen.txt");
-    in.open("Amplitude-Resistance.txt");
+    inGen.open("FGen - Amp - 680Ohm 1-20KHz.txt");
+    in.open("Res - Amp -680Ohm 1-20KHz.txt");
     double x_res, y_res, x_gen, y_gen;
     y_max = 1;
     x_max = 0;
