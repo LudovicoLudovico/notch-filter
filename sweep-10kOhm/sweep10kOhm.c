@@ -1,7 +1,27 @@
+Double_t fitFunc(Double_t *x, Double_t *par){
+    Double_t xx = x[0];
+    Double_t z = 2 * TMath::Pi() * xx;
+    /*par[0]=L
+    par[1]=C
+    par[2]=r
+    par[3]=R*/
+    Double_t A = 1 - z * z * par[0] * par[1];
+    Double_t B = z * par[1] * par[2];
+    Double_t D = par[2] + (par[3] + 50) * A;
+    Double_t E = z * (par[0] + par[1] * (par[3] + 50) * par[2]);
+
+    Double_t val = par[3] / (D * D + E * E) * TMath::Sqrt((A * D + B * E) * (A * D + B * E) + (B * D - A * E) * (B * D - A * E));
+    return val;
+}
+
 void sweep10kOhm(){
     TCanvas* c = new TCanvas("c1", "Sweep with 10kOhm");
     c->Divide(2,3);
 
+    TF1* fit = new TF1("fit",fitFunc,0,20000,4);
+    fit->SetParameters(0.01014,0.000000022,37.937,10000);
+    fit->SetParNames("L","C","r", "R");
+    //TF1* fit = new TF1("transfer", "(10000+50)*sqrt(((1E7+38.40-(x*2*pi)^2*(22*10^(-9)*1E7*10.14*10^(-3)))^2+(x*2*pi)^2*(10.14*10^(-3)+22*10^(-9)*1E7*38.40)^2)/((1E7*38.40 + (10000+50)*(1E7+38.40-(x*2*pi)^2*22*10^(-9)*1E7*10.14*10^(-3)))^2+(x*2*pi)^2*(1E7*10.14*10^(-3)+(10000+50)*(10.14*10^(-3)+22*10^(-9)*1E7*38.40))^2))",0, 20000);
     TGraph* ampFGen = new TGraph("Amplitude-FGen.txt");
     c->cd(1);
     ampFGen->Draw();
@@ -51,7 +71,7 @@ void sweep10kOhm(){
     std::cout << "\nAmplitude of Resistance: \n" << "- Minimum: " << "(" << x_min << " , " << y_min << ")\n";
 
     // Transfer function
-    TGraph* transfer = new TGraph();
+    TGraphErrors* transfer = new TGraphErrors();
     ifstream inGen;
     inGen.open("Amplitude-FGen.txt");
     in.open("Amplitude-Resistance.txt");
@@ -66,12 +86,17 @@ void sweep10kOhm(){
             y_max = transferred;
             x_max = x_res;
         }
-        transfer->SetPoint(transfer->GetN(), (x_res + x_gen) / 2.,transferred);
+        int n = transfer->GetN();
+        transfer->SetPoint(n, (x_res + x_gen) / 2.,transferred);
+        transfer->SetPointError(n, 0, 0.002);
     }
     in.close();
     std::cout << "Min of transfer function: ( " << x_max << " , " << y_max << " )";
     c->cd(5);
     transfer->SetTitle("Transfer function; Frequenza (#Omega); Ampiezza (V)");
+    transfer->Fit("fit", "r");
+    fit->Draw();
     transfer->Draw();
 }
+
 

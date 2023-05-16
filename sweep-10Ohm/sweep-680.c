@@ -54,11 +54,10 @@ void sweep680Ohm(){
     TGraph* transfer = new TGraph();
     ifstream inGen;
     inGen.open("FGen - Amp - 680Ohm 1-20KHz.txt");
-    in.open("Res - Amp - 680Ohm 1-20KHz.txt");
+    in.open("Res - Amp -680Ohm 1-20KHz.txt");
     double x_res, y_res, x_gen, y_gen;
     y_max = 1;
     x_max = 0;
-    std::cout << "1/SQRT(2) " << 1. / sqrt(2) << '\n';
     while(in.good() && inGen.good()) {
         in >> x_res >> y_res;
         inGen >> x_gen >> y_gen;
@@ -68,10 +67,6 @@ void sweep680Ohm(){
             x_max = x_res;
         }
         transfer->SetPoint(transfer->GetN(), (x_res + x_gen) / 2.,transferred);
-        if (abs(transferred - (1. / sqrt(2))) < 0.00114) {
-            std::cout << transferred - (1. / sqrt(2)) << " ";
-            std::cout << "X with height of 1/sqrt(2): " << (x_res + x_gen) / 2. << " and y: " << transferred << "\n";
-        }
     }
     in.close();
     std::cout << "Min of transfer function: ( " << x_max << " , " << y_max << " )";
