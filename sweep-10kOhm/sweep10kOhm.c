@@ -13,6 +13,25 @@ Double_t fitFunc(Double_t *x, Double_t *par){
     Double_t val = par[3] / (D * D + E * E) * TMath::Sqrt((A * D + B * E) * (A * D + B * E) + (B * D - A * E) * (B * D - A * E));
     return val;
 }
+Double_t fitFuncFixedParams(Double_t *x){
+    Double_t xx = x[0];
+    Double_t z = 2 * TMath::Pi() * xx;
+    Double_t L = 0.01014;
+    Double_t C = 0.000000022;
+    Double_t r =37.937;
+    Double_t R = 10000;
+    /*par[0]=L
+    par[1]=C
+    par[2]=r
+    par[3]=R*/
+    Double_t A = 1 - z * z * L * C;
+    Double_t B = z * C * r;
+    Double_t D = r + (R + 50) * A;
+    Double_t E = z * (L + C * (R + 50) * r);
+
+    Double_t val = R / (D * D + E * E) * TMath::Sqrt((A * D + B * E) * (A * D + B * E) + (B * D - A * E) * (B * D - A * E));
+    return val;
+}
 
 void sweep10kOhm(){
     TCanvas* c = new TCanvas("c1", "Sweep with 10kOhm");
@@ -72,6 +91,7 @@ void sweep10kOhm(){
 
     // Transfer function
     TGraphErrors* transfer = new TGraphErrors();
+    transfer->SetMarkerStyle(7);
     ifstream inGen;
     inGen.open("Amplitude-FGen.txt");
     in.open("Amplitude-Resistance.txt");
@@ -88,15 +108,30 @@ void sweep10kOhm(){
         }
         int n = transfer->GetN();
         transfer->SetPoint(n, (x_res + x_gen) / 2.,transferred);
-        transfer->SetPointError(n, 0, 0.002);
+        transfer->SetPointError(n, 0.186, (transferred / y_gen + 1. / y_gen)*0.002);
     }
     in.close();
     std::cout << "Min of transfer function: ( " << x_max << " , " << y_max << " )";
     c->cd(5);
     transfer->SetTitle("Transfer function; Frequenza (#Omega); Ampiezza (V)");
     transfer->Fit("fit", "r");
-    fit->Draw();
     transfer->Draw();
+
+    double x_theo_min = 0;
+    double y_theo_min = 1;
+    for (size_t i = 0; i < 20000000; i++) {
+        double j = i;
+        double eval =fit->Eval(j/1000.);
+        if (eval < y_theo_min) {
+            y_theo_min = eval;
+            x_theo_min = j;
+        }
+    }
+
+    std::cout << "THEO Min: " << x_theo_min / 1000. << " , " << y_theo_min;
+    c->cd(6);
+    TF1* transferFixed = new TF1("transferP", "10000*sqrt()", 0, 20000);
+    transferFixed->Draw();
 }
 
 
